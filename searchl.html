@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok ID Info Tool - Search User Profile</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50' y='50' font-size='50' text-anchor='middle' dy='.3em' fill='%23000'%3E🎵%3C/text%3E%3C/svg%3E">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --dark: #1a1a2e;
+            --light: #f5f7fa;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .search-box button {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-box button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-box button:active {
+            transform: translateY(-1px);
+        }
+
+        .quick-search {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .quick-btn {
+            padding: 8px 16px;
+            background: var(--light);
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .quick-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f0f4ff 100%);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid #e0e7ff;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            overflow: hidden;
+            border: 4px solid var(--primary);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-header {
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .user-id {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .verified-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .user-bio {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background: white;
+            padding: 18px 12px;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .stat:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+        }
+
+        .error {
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #0369a1;
+            margin-top: 20px;
+            border-left: 4px solid #0369a1;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .footer-brand span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid #e0e7ff;
+        }
+
+        .footer-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .footer-credit {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .user-name {
+                font-size: 24px;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 TikTok ID Info Tool</h1>
+        <p>Get Real-Time TikTok User Information</p>
+    </div>
+
+    <div class="container">
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="usernameInput" 
+                    placeholder="Enter TikTok username (e.g., cristiano, khaby)"
+                    autocomplete="off"
+                >
+                <button onclick="searchUser()">🔍 Search</button>
+            </div>
+
+            <div class="quick-search">
+                <span style="font-size: 12px; color: #999; font-weight: 600; align-self: center;">Quick Search:</span>
+                <button class="quick-btn" onclick="quickSearch('cristiano')">Cristiano Ronaldo</button>
+                <button class="quick-btn" onclick="quickSearch('khaby')">Khaby Lame</button>
+                <button class="quick-btn" onclick="quickSearch('addison')">Addison Rae</button>
+            </div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: var(--primary); font-weight: 600;">Fetching user data...</p>
+        </div>
+
+        <div class="result" id="result">
+            <div class="user-card">
+                <div class="avatar">
+                    <img id="userAvatar" src="" alt="Avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23e0e0e0%22/%3E%3Ctext x=%2250%22 y=%2250%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23999%22%3E👤%3C/text%3E%3C/svg%3E'">
+                </div>
+
+                <div class="user-header">
+                    <div class="user-name" id="userName"></div>
+                    <div class="user-id">@<span id="userId"></span></div>
+                    <div class="badges" id="verifiedBadge"></div>
+                </div>
+
+                <div class="user-bio" id="userBio"></div>
+
+                <div class="stats">
+                    <div class="stat" title="Total Followers">
+                        <div class="stat-value" id="followers">0</div>
+                        <div class="stat-label">👥 Followers</div>
+                    </div>
+                    <div class="stat" title="Following">
+                        <div class="stat-value" id="following">0</div>
+                        <div class="stat-label">🔗 Following</div>
+                    </div>
+                    <div class="stat" title="Total Likes">
+                        <div class="stat-value" id="likes">0</div>
+                        <div class="stat-label">❤️ Likes</div>
+                    </div>
+                    <div class="stat" title="Total Videos">
+                        <div class="stat-value" id="videos">0</div>
+                        <div class="stat-label">🎬 Videos</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="action-btn" onclick="copyUserInfo()">📋 Copy Info</button>
+                    <button class="action-btn primary" onclick="shareUser()">📤 Share Profile</button>
+                </div>
+            </div>
+
+            <div class="info-box">
+                ℹ️ <strong>Real-Time Data:</strong> This information is fetched directly from TikTok's public API. Data updates in real-time and is 100% accurate.
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-brand">
+                🚀 Powered by <span>OLD-STUDIO</span>
+            </div>
+            <div class="footer-links">
+                <a href="https://whatsapp.com/channel/0029VavHzv259PwTIz1XxJ09" class="footer-link" target="_blank">
+                    💬 Join WhatsApp Channel
+                </a>
+                <a href="#" class="footer-link" onclick="showAbout(); return false;">
+                    ℹ️ About Us
+                </a>
+            </div>
+            <div class="footer-credit">
+                © 2026 OLD-STUDIO. All rights reserved. | Made with ❤️
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserData = null;
+
+        function searchUser() {
+            const username = document.getElementById('usernameInput').value.trim();
+            performSearch(username);
+        }
+
+        function quickSearch(username) {
+            document.getElementById('usernameInput').value = username;
+            performSearch(username);
+        }
+
+        function performSearch(username) {
+            const errorMsg = document.getElementById('errorMsg');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+
+            errorMsg.classList.remove('show');
+            errorMsg.textContent = '';
+
+            if (!username) {
+                errorMsg.textContent = '⚠️ Please enter a TikTok username';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            loading.style.display = 'block';
+            result.style.display = 'none';
+
+            fetch(`index.php?username=${encodeURIComponent(username)}`)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+
+                    if (data.success && data.data) {
+                        currentUserData = data.data;
+                        displayUserInfo(data.data);
+                        result.style.display = 'block';
+                    } else {
+                        errorMsg.textContent = '❌ ' + (data.error || 'User not found');
+                        errorMsg.classList.add('show');
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    errorMsg.textContent = '❌ Error: ' + error.message;
+                    errorMsg.classList.add('show');
+                });
+        }
+
+        function displayUserInfo(data) {
+            document.getElementById('userName').textContent = data.nickname;
+            document.getElementById('userId').textContent = data.username;
+            document.getElementById('userBio').textContent = data.bio || 'No bio available';
+            document.getElementById('followers').textContent = data.followers;
+            document.getElementById('following').textContent = data.following;
+            document.getElementById('likes').textContent = data.likes;
+            document.getElementById('videos').textContent = data.videos;
+
+            const verifiedBadge = document.getElementById('verifiedBadge');
+            if (data.verified) {
+                verifiedBadge.innerHTML = '<div class="verified-badge">✓ Verified Account</div>';
+            } else {
+                verifiedBadge.innerHTML = '';
+            }
+
+            if (data.avatar && data.avatar !== 'N/A') {
+                document.getElementById('userAvatar').src = data.avatar;
+    
